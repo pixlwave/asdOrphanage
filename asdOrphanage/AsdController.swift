@@ -6,24 +6,17 @@ class AsdController: NSViewController {
 
     @IBOutlet weak var directoryField: NSTextField!
     @IBOutlet weak var orphansTable: NSTableView!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        orphansTable.doubleAction = "showOrphan:"
-        orphansTable.target = self
-    }
 
-    @IBAction func analyse(sender: NSButton) {
+    @IBAction func analyse(_ sender: NSButton) {
         let selectDirectory = NSOpenPanel()
         var directory = ""
         
         selectDirectory.canChooseDirectories = true
         selectDirectory.canChooseFiles = false
         
-        if selectDirectory.runModal() == NSFileHandlingPanelOKButton {
-            let directoryURL = selectDirectory.URLs[0] 
-            directory = directoryURL.path!
+        if selectDirectory.runModal() == .OK {
+            let directoryURL = selectDirectory.urls[0] 
+            directory = directoryURL.path
             directoryField.stringValue = directory
             orphans = AsdOrphans.analyse(directory)
         }
@@ -31,11 +24,11 @@ class AsdController: NSViewController {
         orphansTable.reloadData()
     }
     
-    func showOrphan(sender: NSTableView) {
+    @IBAction func showOrphan(_ sender: NSTableView) {
         if orphansTable.clickedRow != -1 {
-            var file = orphans[orphansTable.clickedRow]
-            file = directoryField.stringValue.stringByAppendingPathComponent(file)
-            AsdOrphans.showFile(file)
+            let file = orphans[orphansTable.clickedRow]
+            let url = URL(fileURLWithPath: file, relativeTo: URL(fileURLWithPath: directoryField.stringValue))
+            AsdOrphans.showFile(url)
         }
     }
     
@@ -44,12 +37,12 @@ class AsdController: NSViewController {
 // MARK: NSTableViewDataSource
 extension AsdController: NSTableViewDataSource {
     
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    func numberOfRows(in tableView: NSTableView) -> Int {
         return orphans.count
     }
     
-    func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row rowIndex: Int) -> AnyObject? {
-        return orphans[rowIndex]
+    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
+        return orphans[row]
     }
     
 }
