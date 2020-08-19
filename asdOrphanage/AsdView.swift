@@ -3,7 +3,7 @@ import SwiftUI
 struct AsdView: View {
     @State private var directory: String?
     @State private var orphans = [String]()
-    @State private var selected = Set<String>()
+    @State private var selected: String?
     
     var body: some View {
         VStack {
@@ -19,7 +19,7 @@ struct AsdView: View {
                 }
                 .contentShape(Rectangle())
                 .gesture(TapGesture().onEnded { _ in
-                    selected = Set<String>(arrayLiteral: orphan)
+                    selected = orphan
                 })
                 .simultaneousGesture(TapGesture(count: 2).onEnded { _ in
                     show(orphan)
